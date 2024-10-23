@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 })
 
 interface AnimatedCardProps {
-  transition: DerivedValue<number>
+  transition: DerivedValue<0 | 1>
   index: number
   card: Cards
 }
