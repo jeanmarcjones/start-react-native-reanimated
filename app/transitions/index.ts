@@ -1,3 +1,3 @@
-import { Transitions } from './Transitions'
+import { Transitions } from './boilerplate/Transitions'
 
 export default Transitions
