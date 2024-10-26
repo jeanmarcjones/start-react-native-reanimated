@@ -21,16 +21,19 @@ const styles = StyleSheet.create({
   },
 })
 
-export const Timing = () => {
+export const Animations = () => {
   const [play, setPlay] = useState(false)
+
   const paused = useSharedValue(!play)
-  const progress = useSharedValue(0)
+  const progress = useSharedValue<number>(0)
+
   useEffect(() => {
     progress.value = withPause(
       withRepeat(withTiming(1, { duration: 1000, easing }), -1, true),
       paused
     )
   }, [paused, progress])
+
   return (
     <View style={styles.container}>
       <ChatBubble progress={progress} />
@@ -39,6 +42,7 @@ export const Timing = () => {
         primary
         onPress={() => {
           setPlay((prev) => !prev)
+          paused.value = !paused.value
         }}
       />
     </View>

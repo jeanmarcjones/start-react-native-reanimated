@@ -2,7 +2,8 @@ import { StyleSheet } from 'react-native'
 import Animated, {
   useAnimatedStyle,
   interpolate,
-  Extrapolate,
+  Extrapolation,
+  type SharedValue,
 } from 'react-native-reanimated'
 
 import { StyleGuide } from '@/components'
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
 })
 
 interface BubbleProps {
-  progress: Animated.SharedValue<number>
+  progress: SharedValue<number>
   start: number
   end: number
 }
@@ -29,13 +30,13 @@ export const Bubble = ({ progress, start, end }: BubbleProps) => {
       progress.value,
       [start, end],
       [0.5, 1],
-      Extrapolate.CLAMP
+      Extrapolation.CLAMP
     )
     const scale = interpolate(
       progress.value,
       [start, end],
       [1, 1.5],
-      Extrapolate.CLAMP
+      Extrapolation.CLAMP
     )
     return { opacity, transform: [{ scale }] }
   })

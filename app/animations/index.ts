@@ -1,3 +1,3 @@
-import { Animations } from './Animations'
+import { Animations } from './boilerplate/Animations'
 
 export default Animations
