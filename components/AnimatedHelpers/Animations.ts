@@ -3,6 +3,7 @@ import {
   defineAnimation,
   type AnimatableValue,
   clamp,
+  type SharedValue,
 } from 'react-native-reanimated'
 
 export interface PhysicsAnimation extends Animation<PhysicsAnimation> {
@@ -29,7 +30,7 @@ export const withBouncing = function (
     const nextAnimation: PhysicsAnimation =
       typeof _nextAnimation === 'function' ? _nextAnimation() : _nextAnimation
 
-    const onFrame = (state: PhysicsAnimation, now: number) => {
+    const bounce = (state: PhysicsAnimation, now: number) => {
       const finished = nextAnimation.onFrame(nextAnimation, now)
       const { velocity, current: position } = nextAnimation
 
@@ -60,10 +61,9 @@ export const withBouncing = function (
     }
 
     return {
-      onFrame,
+      onFrame: bounce,
       onStart,
       current: nextAnimation.current,
-      callback: nextAnimation.callback,
       velocity: 0,
     }
   })
@@ -72,7 +72,7 @@ export const withBouncing = function (
 interface DecayAnimation extends Animation<DecayAnimation> {
   velocity: number
   current: AnimatableValue
-  lastTimeStamp: number
+  lastTimestamp: number
 }
 
 export const VELOCITY_EPS = 1
@@ -84,14 +84,14 @@ export function withDecay(initialVelocity: number): Animation<DecayAnimation> {
   return defineAnimation<DecayAnimation>(0, () => {
     'worklet'
 
-    const onFrame = (state: DecayAnimation, now: number): boolean => {
-      const { velocity, lastTimeStamp, current: position } = state
+    const decay = (state: DecayAnimation, now: number): boolean => {
+      const { velocity, lastTimestamp, current: position } = state
 
       if (typeof position !== 'number') {
         return false
       }
 
-      const deltaTime = now - lastTimeStamp // The amount of time that has passed since the last frame update
+      const deltaTime = now - lastTimestamp // The amount of time that has passed since the last frame update
       const initialVelocity = velocity / 1000 // v0 - Dividing by 1000 to convert to pixels per millisecond
       const velocityChange = Math.pow(deceleration, deltaTime) // kv
 
@@ -103,7 +103,7 @@ export function withDecay(initialVelocity: number): Animation<DecayAnimation> {
 
       state.velocity = v
       state.current = x // This is the position
-      state.lastTimeStamp = now
+      state.lastTimestamp = now
 
       return Math.abs(v) < VELOCITY_EPS
     }
@@ -115,15 +115,75 @@ export function withDecay(initialVelocity: number): Animation<DecayAnimation> {
     ) => {
       state.current = current
       state.velocity = initialVelocity
-      state.lastTimeStamp = now
+      state.lastTimestamp = now
     }
 
     return {
-      onFrame,
+      onFrame: decay,
       onStart,
       velocity: 0,
       current: 0,
-      lastTimeStamp: 0,
+      lastTimestamp: 0,
     }
   })
 }
+
+interface PausableAnimation extends Animation<PausableAnimation> {
+  lastTimestamp: number
+  elapsed: number
+}
+
+type withPauseType = (
+  _nextAnimation: any,
+  paused: SharedValue<boolean>
+) => number
+
+export const withPause = function(
+  _nextAnimation: any,
+  paused: SharedValue<boolean>
+): Animation<PausableAnimation> {
+  'worklet'
+
+  return defineAnimation(_nextAnimation, () => {
+    'worklet'
+
+    const nextAnimation: PausableAnimation =
+      typeof _nextAnimation === 'function' ? _nextAnimation() : _nextAnimation
+
+    const pause = (state: PausableAnimation, now: number) => {
+      const { lastTimestamp, elapsed } = state
+
+      if (paused.value) {
+        state.elapsed = now - lastTimestamp
+
+        return false
+      }
+
+      const deltaTime = now - elapsed
+      const finished = nextAnimation.onFrame(nextAnimation, deltaTime)
+
+      state.current = nextAnimation.current
+      state.lastTimestamp = deltaTime
+
+      return finished
+    }
+
+    const onStart = (
+      state: PausableAnimation,
+      value: AnimatableValue,
+      now: number,
+      previousAnimation: PhysicsAnimation | Animation<any> | null
+    ) => {
+      state.lastTimestamp = now
+      state.elapsed = 0
+      state.current = 0
+
+      nextAnimation.onStart(nextAnimation, value, now, previousAnimation)
+    }
+
+    return {
+      onFrame: pause,
+      onStart,
+    }
+  })
+} as unknown as withPauseType

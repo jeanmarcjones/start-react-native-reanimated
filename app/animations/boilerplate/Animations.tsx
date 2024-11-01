@@ -6,11 +6,11 @@ import {
   useSharedValue,
   Easing,
 } from 'react-native-reanimated'
-import { withPause } from 'react-native-redash'
 
 import { Button, StyleGuide } from '@/components'
 
 import { ChatBubble } from './ChatBubble'
+import { withPause } from '@/components/AnimatedHelpers/Animations'
 
 const easing = Easing.inOut(Easing.ease)
 const styles = StyleSheet.create({
