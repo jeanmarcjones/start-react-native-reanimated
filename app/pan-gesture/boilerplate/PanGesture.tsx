@@ -6,9 +6,11 @@ import Animated, {
   clamp,
   useAnimatedStyle,
   useSharedValue,
-  withDecay,
 } from 'react-native-reanimated'
-import { withBouncing } from 'react-native-redash/src/Animations'
+import {
+  withDecay,
+  withBouncing,
+} from '@/components/AnimatedHelpers/Animations'
 
 const styles = StyleSheet.create({
   container: {
@@ -41,20 +43,8 @@ export const PanGesture = ({ width, height }: GestureProps) => {
       translateY.value = clamp(offsetY.value + event.translationY, 0, boundY)
     })
     .onEnd((event) => {
-      translateX.value = withBouncing(
-        withDecay({
-          velocity: event.velocityX,
-        }),
-        0,
-        boundX
-      )
-      translateY.value = withBouncing(
-        withDecay({
-          velocity: event.velocityY,
-        }),
-        0,
-        boundY
-      )
+      translateX.value = withBouncing(withDecay(event.velocityX), 0, boundX)
+      translateY.value = withBouncing(withDecay(event.velocityY), 0, boundY)
     })
 
   const style = useAnimatedStyle(() => ({
