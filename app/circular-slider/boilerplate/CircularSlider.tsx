@@ -11,10 +11,7 @@ const size = width - 32
 const STROKE_WIDTH = 40
 const r = PixelRatio.roundToNearestPixel(size / 2)
 
-const defaultTheta = canvas2Polar(
-  { x: 0, y: 0 },
-  { x: r, y: r }
-).theta
+const defaultTheta = canvas2Polar({ x: 0, y: 0 }, { x: r, y: r }).theta
 
 export const CircularSlider = () => {
   const theta = useSharedValue(defaultTheta)
@@ -23,10 +20,7 @@ export const CircularSlider = () => {
     <View style={styles.container}>
       <View style={styles.content}>
         <Animated.View style={StyleSheet.absoluteFill}>
-          <CircularProgress
-            strokeWidth={STROKE_WIDTH}
-            {...{ theta, r }}
-          />
+          <CircularProgress strokeWidth={STROKE_WIDTH} {...{ theta, r }} />
         </Animated.View>
         <Cursor
           strokeWidth={STROKE_WIDTH}

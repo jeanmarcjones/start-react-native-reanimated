@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native'
 
 import { StyleGuide } from '@/components'
-import { PanGestureHandler } from 'react-native-gesture-handler'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
   clamp,
   type SharedValue,
-  useAnimatedGestureHandler,
   useAnimatedStyle,
+  useSharedValue,
 } from 'react-native-reanimated'
 import { canvas2Polar, polar2Canvas } from 'react-native-redash'
 
@@ -22,20 +22,22 @@ interface CursorProps {
 export const Cursor = ({ theta, radius, strokeWidth }: CursorProps) => {
   const center = { x: radius, y: radius }
 
-  const onGestureEvent = useAnimatedGestureHandler({
-    onStart: (_event, ctx) => {
-      ctx.offset = polar2Canvas(
+  const offset = useSharedValue({ x: 0, y: 0 })
+
+  const pan = Gesture.Pan()
+    .onStart(() => {
+      offset.value = polar2Canvas(
         {
           theta: theta.value,
           radius,
         },
         center
       )
-    },
-    onActive: (event, ctx) => {
+    })
+    .onUpdate((event) => {
       const { translationX, translationY } = event
-      const x = ctx.offset.x + translationX
-      const y1 = ctx.offset.y + translationY
+      const x = offset.value.x + translationX
+      const y1 = offset.value.y + translationY
 
       let y: number
       if (x < radius) {
@@ -48,10 +50,7 @@ export const Cursor = ({ theta, radius, strokeWidth }: CursorProps) => {
 
       const value = canvas2Polar({ x, y }, center).theta
       theta.value = value > 0 ? value : 2 * PI + value
-
-      ctx.theta = theta.value
-    },
-  })
+    })
 
   const animatedStyle = useAnimatedStyle(() => {
     const { x: translateX, y: translateY } = polar2Canvas(
@@ -68,7 +67,7 @@ export const Cursor = ({ theta, radius, strokeWidth }: CursorProps) => {
   })
 
   return (
-    <PanGestureHandler {...{ onGestureEvent }}>
+    <GestureDetector gesture={pan}>
       <Animated.View
         style={[
           {
@@ -83,6 +82,6 @@ export const Cursor = ({ theta, radius, strokeWidth }: CursorProps) => {
           animatedStyle,
         ]}
       />
-    </PanGestureHandler>
+    </GestureDetector>
   )
 }
