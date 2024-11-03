@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyleSheet } from 'react-native'
 import Animated, {
+  type DerivedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
 } from 'react-native-reanimated'
@@ -14,7 +15,7 @@ interface CursorProps {
   r: number
   strokeWidth: number
   theta: Animated.SharedValue<number>
-  backgroundColor: Animated.SharedValue<string | number>
+  backgroundColor: DerivedValue<string>
 }
 
 export const Cursor = ({

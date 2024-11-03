@@ -1,3 +1,3 @@
-import { CircularSlider } from './CircularSlider'
+import { CircularSlider } from './boilerplate/CircularSlider'
 
 export default CircularSlider

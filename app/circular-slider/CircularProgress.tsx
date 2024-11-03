@@ -1,6 +1,6 @@
 import type { ColorValue } from 'react-native'
 import { StyleSheet } from 'react-native'
-import Animated, { useAnimatedProps } from 'react-native-reanimated'
+import Animated, { type DerivedValue, useAnimatedProps } from 'react-native-reanimated'
 import Svg, { Circle } from 'react-native-svg'
 
 import { StyleGuide } from '@/components'
@@ -12,7 +12,7 @@ interface CircularProgressProps {
   theta: Animated.SharedValue<number>
   r: number
   strokeWidth: number
-  backgroundColor: Animated.SharedValue<string | number>
+  backgroundColor: DerivedValue<string>
 }
 
 export const CircularProgress = ({

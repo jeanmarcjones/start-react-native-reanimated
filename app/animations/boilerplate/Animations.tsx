@@ -10,7 +10,7 @@ import {
 import { Button, StyleGuide } from '@/components'
 
 import { ChatBubble } from './ChatBubble'
-import { withPause } from '@/components/AnimatedHelpers/Animations'
+import { withPause } from '@/components/AnimatedHelpers'
 
 const easing = Easing.inOut(Easing.ease)
 const styles = StyleSheet.create({

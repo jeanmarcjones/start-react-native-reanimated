@@ -10,7 +10,7 @@ import Animated, {
 import {
   withDecay,
   withBouncing,
-} from '@/components/AnimatedHelpers/Animations'
+} from '@/components/AnimatedHelpers'
 
 const styles = StyleSheet.create({
   container: {
